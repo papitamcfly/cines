@@ -50,7 +50,13 @@ class AuthController extends Controller
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Credenciales no válidas'], 401);
         }
-    
+        $user = auth()->user();
+        if (!$user->is_active) {
+            $this->mandarcorreo($user);
+            return response()->json([
+                'message' => 'Verifica tu correo para activar tu cuenta.'
+            ],201);
+        }
         // Si la autenticación es exitosa, responder con el token
         return response()->json(['token' => $token], 200);
     }
@@ -127,9 +133,8 @@ class AuthController extends Controller
         ],201);
     }
 
-    public function mandarcorreo()
+    public function mandarcorreo($user)
     {
-        $user = $this->guard()->user();
         $token = JWTAuth::fromUser($user);
         $url = URL::temporarySignedRoute(
             'activate', now()->addMinutes(30), ['token' => $token]
