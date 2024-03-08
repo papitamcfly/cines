@@ -32,18 +32,27 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // Validar las credenciales
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
-
-
-        if ($token = $this->guard()->attempt($validator)) {
-            return $this->respondWithToken($token);
+    
+        // Si la validación falla, devolver los errores
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
         }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
+    
+        // Extraer las credenciales de la solicitud
+        $credentials = $request->only('email', 'password');
+    
+        // Intentar autenticar al usuario con las credenciales
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Credenciales no válidas'], 401);
+        }
+    
+        // Si la autenticación es exitosa, responder con el token
+        return response()->json(['token' => $token], 200);
     }
 
     /**
@@ -118,6 +127,19 @@ class AuthController extends Controller
         ],201);
     }
 
+    public function mandarcorreo()
+    {
+        $user = $this->guard()->user();
+        $token = JWTAuth::fromUser($user);
+        $url = URL::temporarySignedRoute(
+            'activate', now()->addMinutes(30), ['token' => $token]
+        );
+
+        Mail::to($user->email)->send(new AccountActivationMail($url));
+                return response()->json([
+            'message' => 'Verifica tu correo para activar tu cuenta.'
+        ],201);
+    }
     public function activate($token)
     {
         $user = JWTAuth::parseToken()->authenticate();
