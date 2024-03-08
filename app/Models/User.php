@@ -20,6 +20,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(PersonalAccessToken::class);
     }
+
+    public function rol()
+    {
+        return $this->belongsTo(roles::class,'rol');
+    }
     /**
      * The attributes that are mass assignable.
      *

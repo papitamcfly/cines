@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Mail\AccountActivationMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -29,9 +32,14 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
 
-        if ($token = $this->guard()->attempt($credentials)) {
+
+        if ($token = $this->guard()->attempt($validator)) {
             return $this->respondWithToken($token);
         }
 
@@ -98,11 +106,39 @@ class AuthController extends Controller
             $validator->validated(),
             ['password'=>bcrypt($request->password)]
         ));
+        $token = JWTAuth::fromUser($user);
 
+        $url = URL::temporarySignedRoute(
+            'activate', now()->addMinutes(30), ['token' => $token]
+        );
+
+        Mail::to($user->email)->send(new AccountActivationMail($url));
         return response()->json([
-            'message' => 'usuario registrado correctamente', 'user'=>$user
+            'message' => 'usuario registrado correctamente. verifica tu correo para activar tu cuenta ', 'user'=>$user
         ],201);
     }
+
+    public function activate($token)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+ 
+        if ($user->is_active  == 0) {
+            $user->is_active = 1;
+            $user->save();
+ 
+            return response()->json([
+                'success' => true,
+                'message' => 'Account activated successfully.',
+            ]);
+        }
+ 
+        return response()->json([
+            'success' => false,
+            'message' => 'Account is already activated.',
+        ]);
+    }
+
+    
     /**
      * Get the guard to be used during authentication.
      *
