@@ -61,6 +61,25 @@ class AuthController extends Controller
         return response()->json(['token' => $token], 200);
     }
 
+    public function verifyCode(Request $request)
+    {
+        $user = auth()->user();
+        $code = $request->input('code');
+    
+
+        $verificationCode = VerificationCode::where('user_id', $user->id)
+                                            ->where('code', $code)
+                                            ->first();
+    
+        if ($verificationCode) {
+            // Código correcto, generar el token JWT
+            $token = JWTAuth::fromUser($user);
+            return response()->json(['token' => $token], 200);
+        } else {
+            // Código incorrecto
+            return response()->json(['error' => 'El código de verificación es incorrecto.'], 401);
+        }
+    }
     /**
      * Get the authenticated User
      *
