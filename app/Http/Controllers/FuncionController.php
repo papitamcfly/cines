@@ -22,6 +22,14 @@ class FuncionController extends Controller
             'pelicula_id' => 'required|exists:peliculas,id',
             'fecha' => 'required|date',
             'hora_inicio' => 'required',
+        ], [
+            'sala_id.required' => 'El campo Sala es obligatorio.',
+            'sala_id.exists' => 'La Sala seleccionada no existe.',
+            'pelicula_id.required' => 'El campo Película es obligatorio.',
+            'pelicula_id.exists' => 'La Película seleccionada no existe.',
+            'fecha.required' => 'El campo Fecha es obligatorio.',
+            'fecha.date' => 'El valor ingresado para la Fecha no es válido.',
+            'hora_inicio.required' => 'El campo Hora de inicio es obligatorio.',
         ]);
 
         if ($validator->fails()) {

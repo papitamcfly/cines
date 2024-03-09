@@ -5,6 +5,10 @@ use App\Http\Controllers\cineController;
 use App\Http\Controllers\SalaController;
 use App\Http\Controllers\FuncionController;
 use App\Http\Controllers\BoletoController;
+use App\Http\Controllers\CombosController;
+use App\Http\Controllers\GenerosController;
+use App\Http\Controllers\PeliculasController;
+use App\Http\Controllers\ProductosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,7 +58,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/salas', [SalaController::class, 'store'])->name('createSala');
     Route::get('/salas/{sala}', [SalaController::class, 'show'])->where('sala', '[0-9]+')->name('showSala');
     Route::put('/salas/{sala}', [SalaController::class, 'update'])->where('sala', '[0-9]+')->name('updateSala');
-    Route::delete('/salas/{sala}', [SalaController::class, 'destroy'])->where('sala', '[0-9]+')->name('deleteCine');
+    Route::delete('/salas/{sala}', [SalaController::class, 'destroy'])->where('sala', '[0-9]+')->name('deleteSala');
 });
 
 Route::middleware('auth:api')->group(function () {
@@ -71,4 +75,33 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/boletos/{boleto}', [BoletoController::class, 'show'])->where('boleto', '[0-9]+')->name('showBoleto');;
     Route::put('/boletos/{boleto}', [BoletoController::class, 'update'])->where('boleto', '[0-9]+')->name('updateBoleto');;
     Route::delete('/boletos/{boleto}', [BoletoController::class, 'destroy'])->where('boleto', '[0-9]+')->name('deleteBoleto');;
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('/peliculas', [PeliculasController::class, 'index'])->name('allpeliculas');
+    Route::post('/peliculas', [PeliculasController::class, 'store'])->name('createpeliculas');
+    Route::get('/peliculas/{pelicula}', [PeliculasController::class, 'show'])->where('pelicula', '[0-9]+')->name('showPelicula');;
+    Route::put('/peliculas/{pelicula}', [PeliculasController::class, 'update'])->where('pelicula', '[0-9]+')->name('updatePelicula');;
+    Route::delete('/peliculas/{pelicula}', [PeliculasController::class, 'destroy'])->where('pelicula', '[0-9]+')->name('deletePelicula');;
+});
+Route::middleware('auth:api')->group(function () {
+    Route::get('/generos', [GenerosController::class, 'index'])->name('allgeneros');
+    Route::post('/generos', [GenerosController::class, 'store'])->name('creategeneros');
+    Route::get('/generos/{genero}', [GenerosController::class, 'show'])->where('genero', '[0-9]+')->name('showgeneros');;
+    Route::put('/generos/{genero}', [GenerosController::class, 'update'])->where('genero', '[0-9]+')->name('updategeneros');;
+    Route::delete('/generos/{genero}', [GenerosController::class, 'destroy'])->where('genero', '[0-9]+')->name('deletegeneros');;
+});
+Route::middleware('auth:api')->group(function () {
+    Route::get('/productos', [ProductosController::class, 'index'])->name('allproductos');
+    Route::post('/productos', [ProductosController::class, 'store'])->name('createproductos');
+    Route::get('/productos/{producto}', [ProductosController::class, 'show'])->where('producto', '[0-9]+')->name('showproductos');;
+    Route::put('/productos/{producto}', [ProductosController::class, 'update'])->where('producto', '[0-9]+')->name('updateproductos');;
+    Route::delete('/productos/{producto}', [ProductosController::class, 'destroy'])->where('producto', '[0-9]+')->name('deleteproductos');;
+});
+Route::middleware('auth:api')->group(function () {
+    Route::get('/combos', [CombosController::class, 'index'])->name('allcombos');
+    Route::post('/combos', [CombosController::class, 'store'])->name('createcombos');
+    Route::get('/combos/{combo}', [CombosController::class, 'show'])->where('combo', '[0-9]+')->name('showcombos');;
+    Route::put('/combos/{combo}', [CombosController::class, 'update'])->where('combo', '[0-9]+')->name('updatecombos');;
+    Route::delete('/combos/{combo}', [CombosController::class, 'destroy'])->where('combo', '[0-9]+')->name('deletecombos');;
 });

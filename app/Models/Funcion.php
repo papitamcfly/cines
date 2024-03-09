@@ -42,10 +42,5 @@ class Funcion extends Model
         return $this->hasMany(Boleto::class, 'id_funcion');
     }
 
-    /* A;adir este metodo en el modelo de Pelicula
-    public function funciones()
-    {
-        return $this->hasMany(Funcion::class);
-    }
-    */
+
 }

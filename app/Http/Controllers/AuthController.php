@@ -76,7 +76,7 @@ class AuthController extends Controller
     {
         $user = auth()->user();
         $code = $request->input('code');
-    
+       
 
         $verificationCode = VerificationCode::where('user_id', $user->id)
                                             ->where('code', $code)
