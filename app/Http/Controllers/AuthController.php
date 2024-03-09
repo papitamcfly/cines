@@ -5,7 +5,9 @@ use App\Mail\AccountActivationMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Mail\VerificationCodeMail;
 use App\Models\User;
+use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +22,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register','verifyCode']]);
     }
 
     /**
@@ -57,8 +59,17 @@ class AuthController extends Controller
                 'message' => 'Verifica tu correo para activar tu cuenta.'
             ],201);
         }
+        $code = mt_rand(100000, 999999);
+            // Almacenar el código en la base de datos
+    VerificationCode::create([
+        'user_id' => $user->id,
+        'code' => $code,
+    ]);
+
+    // Enviar el código por correo electrónico
+    Mail::to($user->email)->send(new VerificationCodeMail($code));
         // Si la autenticación es exitosa, responder con el token
-        return response()->json(['token' => $token], 200);
+        return response()->json(['message' => 'Verifica tu correo electrónico para obtener el código de verificación.','token'=>$token], 200);
     }
 
     public function verifyCode(Request $request)
