@@ -21,8 +21,16 @@ class SalaController extends Controller
             'cine_id' => 'required|exists:cines,id',
             'numero_sala' => 'required|int',
             'capacidad' => 'required|int|min:1',
+        ], [
+            'cine_id.required' => 'El campo cine_id es obligatorio.',
+            'cine_id.exists' => 'El cine_id proporcionado no existe.',
+            'numero_sala.required' => 'El campo número de sala es obligatorio.',
+            'numero_sala.int' => 'El campo número de sala debe ser un número entero.',
+            'capacidad.required' => 'El campo capacidad es obligatorio.',
+            'capacidad.int' => 'El campo capacidad debe ser un número entero.',
+            'capacidad.min' => 'El campo capacidad debe ser al menos 1.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -49,8 +57,16 @@ class SalaController extends Controller
             'cine_id' => 'required|exists:cines,id',
             'numero_sala' => 'required|int',
             'capacidad' => 'required|int|min:1',
+        ], [
+            'cine_id.required' => 'El campo cine_id es obligatorio.',
+            'cine_id.exists' => 'El cine_id proporcionado no existe.',
+            'numero_sala.required' => 'El campo número de sala es obligatorio.',
+            'numero_sala.int' => 'El campo número de sala debe ser un número entero.',
+            'capacidad.required' => 'El campo capacidad es obligatorio.',
+            'capacidad.int' => 'El campo capacidad debe ser un número entero.',
+            'capacidad.min' => 'El campo capacidad debe ser al menos 1.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
