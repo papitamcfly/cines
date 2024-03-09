@@ -31,7 +31,7 @@ class FuncionController extends Controller
             'fecha.date' => 'El valor ingresado para la Fecha no es válido.',
             'hora_inicio.required' => 'El campo Hora de inicio es obligatorio.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -59,8 +59,16 @@ class FuncionController extends Controller
             'pelicula_id' => 'required|exists:peliculas,id',
             'fecha' => 'required|date',
             'hora_inicio' => 'required',
+        ], [
+            'sala_id.required' => 'El campo sala_id es obligatorio.',
+            'sala_id.exists' => 'El sala_id proporcionado no existe.',
+            'pelicula_id.required' => 'El campo pelicula_id es obligatorio.',
+            'pelicula_id.exists' => 'El pelicula_id proporcionado no existe.',
+            'fecha.required' => 'El campo fecha es obligatorio.',
+            'fecha.date' => 'El campo fecha debe ser una fecha válida.',
+            'hora_inicio.required' => 'El campo hora_inicio es obligatorio.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }

@@ -25,8 +25,17 @@ class BoletoController extends Controller
             'fila' => 'required',
             'asiento' => 'required',
             'precio' => 'required|numeric',
+        ], [
+            'id_funcion.required' => 'El campo id_funcion es obligatorio.',
+            'id_funcion.exists' => 'El id_funcion proporcionado no existe.',
+            'id_user.required' => 'El campo id_user es obligatorio.',
+            'id_user.exists' => 'El id_user proporcionado no existe.',
+            'fila.required' => 'El campo fila es obligatorio.',
+            'asiento.required' => 'El campo asiento es obligatorio.',
+            'precio.required' => 'El campo precio es obligatorio.',
+            'precio.numeric' => 'El campo precio debe ser un número.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -57,8 +66,17 @@ class BoletoController extends Controller
             'fila' => 'required',
             'asiento' => 'required',
             'precio' => 'required|numeric',
+        ], [
+            'id_funcion.required' => 'El campo id_funcion es obligatorio.',
+            'id_funcion.exists' => 'El id_funcion proporcionado no existe.',
+            'id_user.required' => 'El campo id_user es obligatorio.',
+            'id_user.exists' => 'El id_user proporcionado no existe.',
+            'fila.required' => 'El campo fila es obligatorio.',
+            'asiento.required' => 'El campo asiento es obligatorio.',
+            'precio.required' => 'El campo precio es obligatorio.',
+            'precio.numeric' => 'El campo precio debe ser un número.',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
