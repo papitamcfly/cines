@@ -19,7 +19,7 @@ class Sala extends Model
         'numero_sala',
         'capacidad',
     ];
-
+    public $timestamps= false;
     /**
      * Get the cine that owns the sala.
      */

@@ -10,6 +10,7 @@ class Combo extends Model
     use HasFactory;
     
     protected $table = 'combos';
+    
     protected $fillable = ['nombre','descripcion','precio'];
     public $timestamps= false;
     public function productos(){
