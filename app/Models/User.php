@@ -25,6 +25,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(roles::class,'rol');
     }
+    
 
     public function boletos()
     {

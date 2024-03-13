@@ -4,17 +4,36 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 class RoleMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next, ...$role)
     {
-        return $next($request);
+        $user = Auth::user();
+    
+        if (!$user) {
+            return response()->json(['message' => 'Acceso no autorizado'], 403);
+        }
+    
+        $userRole = $user->rol;
+        $hasAccess = in_array($userRole, $role);
+    
+        if ($hasAccess) {
+            return $next($request);
+        }
+    
+        return response()->json(['message' => 'Acceso no autorizado'], 403);
     }
+
 }
