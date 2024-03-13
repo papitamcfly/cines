@@ -16,17 +16,17 @@ class cineController extends Controller
 
     public function store(Request $request){
         $validate = Validator::make($request->all(),[
-            'nombre'  => 'required|min:5|max:20|string',
-            'direccion' => 'required|min:10|max:40|string',
+            'nombre'  => 'required|min:2|max:20|string',
+            'dirección' => 'required|min:10|max:40|string',
             'ciudad' => 'required|min:5|max:20|string',
             'capacidad_total' => 'required|integer|min:1'
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
-            'nombre.min' => 'El campo nombre debe tener al menos 5 caracteres.',
+            'nombre.min' => 'El campo nombre debe tener al menos 2 caracteres.',
             'nombre.max' => 'El campo nombre no debe tener más de 20 caracteres.',
-            'direccion.required' => 'El campo dirección es obligatorio.',
-            'direccion.min' => 'El campo dirección debe tener al menos 10 caracteres.',
-            'direccion.max' => 'El campo dirección no debe tener más de 40 caracteres.',
+            'dirección.required' => 'El campo dirección es obligatorio.',
+            'dirección.min' => 'El campo dirección debe tener al menos 10 caracteres.',
+            'dirección.max' => 'El campo dirección no debe tener más de 40 caracteres.',
             'ciudad.required' => 'El campo ciudad es obligatorio.',
             'ciudad.min' => 'El campo ciudad debe tener al menos 5 caracteres.',
             'ciudad.max' => 'El campo ciudad no debe tener más de 20 caracteres.',
@@ -56,17 +56,17 @@ class cineController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'nombre'  => 'required|min:5|max:20|string',
-            'direccion' => 'required|min:10|max:40|string',
+            'nombre'  => 'required|min:2|max:20|string',
+            'dirección' => 'required|min:10|max:40|string',
             'ciudad' => 'required|min:5|max:20|string',
             'capacidad_total' => 'required|integer|min:1'
         ], [
             'nombre.required' => 'El campo nombre es obligatorio.',
-            'nombre.min' => 'El campo nombre debe tener al menos 5 caracteres.',
+            'nombre.min' => 'El campo nombre debe tener al menos 2 caracteres.',
             'nombre.max' => 'El campo nombre no debe tener más de 20 caracteres.',
-            'direccion.required' => 'El campo dirección es obligatorio.',
-            'direccion.min' => 'El campo dirección debe tener al menos 10 caracteres.',
-            'direccion.max' => 'El campo dirección no debe tener más de 40 caracteres.',
+            'dirección.required' => 'El campo dirección es obligatorio.',
+            'dirección.min' => 'El campo dirección debe tener al menos 10 caracteres.',
+            'dirección.max' => 'El campo dirección no debe tener más de 40 caracteres.',
             'ciudad.required' => 'El campo ciudad es obligatorio.',
             'ciudad.min' => 'El campo ciudad debe tener al menos 5 caracteres.',
             'ciudad.max' => 'El campo ciudad no debe tener más de 20 caracteres.',
