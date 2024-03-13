@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -61,40 +62,47 @@ class AuthController extends Controller
             ],201);
         }
         $code = mt_rand(100000, 999999);
+        $hashedCode = Hash::make($code);
             // Almacenar el código en la base de datos
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
-    ]);
+            'code' => $hashedCode,
+        ]);
 
-    // Enviar el código por correo electrónico
-    Mail::to($user->email)->send(new VerificationCodeMail($code));
-        // Si la autenticación es exitosa, responder con el token
-        return response()->json(['message' => 'Verifica tu correo electrónico para obtener el código de verificación.','token'=>$token], 200);
+        // Enviar el código por correo electrónico
+        Mail::to($user->email)->send(new VerificationCodeMail($code));
+            // Si la autenticación es exitosa, responder con un mensaje
+            //Cambiar codigo de angular para que funcione sin el token
+            return response()->json(['message' => 'Verifica tu correo electrónico para obtener el código de verificación.'], 200);
     }
 
     public function verifyCode(Request $request)
     {
-        $user = auth()->user();
-        log::info($user);
+        $email = $request->only('email');
         $code = $request->input('code');
-       
-        log::info($code);
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'El usuario no existe.'], 401);
+        }
 
         $verificationCode = VerificationCode::where('user_id', $user->id)
-                                            ->where('code', $code)
+                                            ->where('is_used', false)
                                             ->first();
 
         log::info($verificationCode);
-    
-        if ($verificationCode) {
-            // Código correcto, generar el token JWT
-            $token = JWTAuth::fromUser($user);
-            return response()->json(['token' => $token,'codigo'=>$verificationCode], 200);
-        } else {
-            // Código incorrecto
-            return response()->json(['error' => 'El código de verificación es incorrecto.'], 401);
+
+        if (!$verificationCode || !Hash::check($code, $verificationCode->code)) {
+            return response()->json(['error' => 'No se encontró un código de verificación válido.'], 401);
         }
+
+        // Código correcto, generar el token JWT
+        $token = JWTAuth::fromUser($user);
+        // Se marca el codigo como condon usado
+        $verificationCode->markAsUsed();
+        return response()->json(['token' => $token,'codigo'=>$verificationCode], 200);
+         
     }
     /**
      * Get the authenticated User
@@ -149,23 +157,23 @@ class AuthController extends Controller
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|confirmed|min:6',
         ]);
-    if($validator->fails()){
-        return response()->json($validator->errors()->toJson(),400);
-        }
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password'=>bcrypt($request->password)]
-        ));
-        $token = JWTAuth::fromUser($user);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(),400);
+            }
+            $user = User::create(array_merge(
+                $validator->validated(),
+                ['password'=>bcrypt($request->password)]
+            ));
+            $token = JWTAuth::fromUser($user);
 
-        $url = URL::temporarySignedRoute(
-            'activate', now()->addMinutes(30), ['token' => $token]
-        );
+            $url = URL::temporarySignedRoute(
+                'activate', now()->addMinutes(30), ['token' => $token]
+            );
 
-        Mail::to($user->email)->send(new AccountActivationMail($url));
-        return response()->json([
-            'message' => 'usuario registrado correctamente. verifica tu correo para activar tu cuenta ', 'user'=>$user
-        ],201);
+            Mail::to($user->email)->send(new AccountActivationMail($url));
+            return response()->json([
+                'message' => 'usuario registrado correctamente. verifica tu correo para activar tu cuenta ', 'user'=>$user
+            ],201);
     }
 
     public function mandarcorreo($user)
