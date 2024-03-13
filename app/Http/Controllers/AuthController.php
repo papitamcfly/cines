@@ -101,6 +101,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
         // Se marca el codigo como condon usado
         $verificationCode->markAsUsed();
+        
         return response()->json(['token' => $token,'codigo'=>$verificationCode], 200);
          
     }
