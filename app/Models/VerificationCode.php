@@ -22,4 +22,10 @@ class VerificationCode extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function markAsUsed()
+    {
+        $this->is_used = true;
+        $this->save();
+    }
 }
