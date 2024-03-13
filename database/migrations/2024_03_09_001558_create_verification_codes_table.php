@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('code');
             $table->timestamps();
-        
+            $table->boolean('is_used')->default(false);
+            $table->timestamp('expires_at'); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

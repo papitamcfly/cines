@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -61,10 +62,13 @@ class AuthController extends Controller
             ],201);
         }
         $code = mt_rand(100000, 999999);
+        $hashedCode = Hash::make($code);
+        $expiresAt = now()->addMinutes(5); // Establece la expiración en 5 minutos
             // Almacenar el código en la base de datos
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
+            'code' => $hashedCode,
+            'expires_at' => $expiresAt, // Agrega la fecha de expiración
     ]);
 
     // Enviar el código por correo electrónico
@@ -82,18 +86,23 @@ class AuthController extends Controller
         log::info($code);
 
         $verificationCode = VerificationCode::where('user_id', $user->id)
-                                            ->where('code', $code)
+                                            ->where('is_used', false)
+                                            ->where('expires_at', '>', now())
                                             ->first();
 
-        log::info($verificationCode);
+        log::info($verificationCode || !Hash::check($code, $verificationCode->code));
     
         if ($verificationCode) {
+
             // Código correcto, generar el token JWT
             $token = JWTAuth::fromUser($user);
-            return response()->json(['token' => $token,'codigo'=>$verificationCode], 200);
+            // Se marca el codigo como condon usado
+            $verificationCode->markAsUsed();
+
+            return $this -> respondWithToken($token);
         } else {
             // Código incorrecto
-            return response()->json(['error' => 'El código de verificación es incorrecto.'], 401);
+            return response()->json(['error' => 'El código de verificación es incorrecto o ha expirado.'], 401);
         }
     }
     /**
