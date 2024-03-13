@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -61,9 +62,9 @@ class AuthController extends Controller
         }
         $code = mt_rand(100000, 999999);
             // Almacenar el código en la base de datos
-    VerificationCode::create([
-        'user_id' => $user->id,
-        'code' => $code,
+        VerificationCode::create([
+            'user_id' => $user->id,
+            'code' => $code,
     ]);
 
     // Enviar el código por correo electrónico
@@ -75,12 +76,16 @@ class AuthController extends Controller
     public function verifyCode(Request $request)
     {
         $user = auth()->user();
+        log::info($user);
         $code = $request->input('code');
        
+        log::info($code);
 
         $verificationCode = VerificationCode::where('user_id', $user->id)
                                             ->where('code', $code)
                                             ->first();
+
+        log::info($verificationCode);
     
         if ($verificationCode) {
             // Código correcto, generar el token JWT
