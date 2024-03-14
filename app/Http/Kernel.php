@@ -16,6 +16,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // ...
         'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'limited-access-token' => \App\Http\Middleware\LimitedAccessTokenMiddleware::class,
     ];
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
