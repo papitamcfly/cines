@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 
 class GenerosController extends Controller
 {
+    public function index(){
+        $cines =  Genero::all();
+        return response()->json($cines, 200);
+    }
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(),[
