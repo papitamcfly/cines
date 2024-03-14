@@ -18,16 +18,16 @@ class CombosController extends Controller
             'productos' => 'required|array|min:1',
             'productos.*' => 'exists:productos,id'
         ],[
-            'nombre.required' => 'El título de la película es obligatorio.',
-            'nombre.string' => 'El título de la película debe ser una cadena de texto.',
-            'nombre.max' => 'El título de la película no debe exceder los 255 caracteres.',
-            'descripcion.required' => 'La sinopsis de la película es obligatoria.',
-            'precio.required' => 'La duración de la película es obligatoria.',
-            'precio.numeric' => 'La duración de la película debe ser un valor numérico.',
-            'productos.required' => 'Debe seleccionar al menos un género para la película.',
-            'productos.array' => 'Los géneros de la película deben ser un array.',
-            'productos.min' => 'Debe seleccionar al menos un género para la película.',
-            'productos.*.exists' => 'Uno o más de los géneros seleccionados no existen en la base de datos.'
+            'nombre.required' => 'El título de la combo es obligatorio.',
+            'nombre.string' => 'El título de la combo debe ser una cadena de texto.',
+            'nombre.max' => 'El título de la combo no debe exceder los 255 caracteres.',
+            'descripcion.required' => 'La sinopsis de la combo es obligatoria.',
+            'precio.required' => 'La duración de la combo es obligatoria.',
+            'precio.numeric' => 'La duración de la combo debe ser un valor numérico.',
+            'productos.required' => 'Debe seleccionar al menos un género para la combo.',
+            'productos.array' => 'Los géneros de la combo deben ser un array.',
+            'productos.min' => 'Debe seleccionar al menos un producto para el combo.',
+            'productos.*.exists' => 'Uno o más de los productos seleccionados no existen.'
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -65,15 +65,15 @@ class CombosController extends Controller
             'productos' => 'required|array|min:1',
             'productos.*' => 'exists:productos,id'
         ],[
-            'nombre.required' => 'El título de la película es obligatorio.',
-            'nombre.string' => 'El título de la película debe ser una cadena de texto.',
-            'nombre.max' => 'El título de la película no debe exceder los 255 caracteres.',
-            'descripcion.required' => 'La sinopsis de la película es obligatoria.',
-            'precio.required' => 'La duración de la película es obligatoria.',
-            'precio.numeric' => 'La duración de la película debe ser un valor numérico.',
-            'productos.required' => 'Debe seleccionar al menos un género para la película.',
-            'productos.array' => 'Los géneros de la película deben ser un array.',
-            'productos.min' => 'Debe seleccionar al menos un género para la película.',
+            'nombre.required' => 'El título de la combo es obligatorio.',
+            'nombre.string' => 'El título de la combo debe ser una cadena de texto.',
+            'nombre.max' => 'El título de la combo no debe exceder los 255 caracteres.',
+            'descripcion.required' => 'La sinopsis de la combo es obligatoria.',
+            'precio.required' => 'La duración de la combo es obligatoria.',
+            'precio.numeric' => 'La duración de la combo debe ser un valor numérico.',
+            'productos.required' => 'Debe seleccionar al menos un género para la combo.',
+            'productos.array' => 'Los géneros de la combo deben ser un array.',
+            'productos.min' => 'Debe seleccionar al menos un producto para la combo.',
             'productos.*.exists' => 'Uno o más de los géneros seleccionados no existen en la base de datos.'
         ]);
         if ($validator->fails()) {
