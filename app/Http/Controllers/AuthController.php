@@ -11,12 +11,18 @@ use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Sanctum;
+use Tymon\JWTAuth\Providers\JWT\Provider;
+use Tymon\JWTAuth\JWTGuard;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
+    protected $auth;
     /**
      * Create a new AuthController instance.
      *
@@ -25,6 +31,23 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login','register','verifyCode']]);
+    }
+
+    public function generateTokenWithCustomGuard($user, $guardName)
+    {
+        $customClaims = [
+            'abilities' => [$guardName],
+        ];
+
+        try {
+            $token = JWTAuth::claims($customClaims)->fromUser($user);
+        } catch (JWTException $e) {
+            // Manejar la excepción aquí
+            return response()->json(['error' => 'Error al generar el token'], 500);
+        }
+        
+
+        return $token;
     }
 
     /**
@@ -51,16 +74,22 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
     
         // Intentar autenticar al usuario con las credenciales
-        if (!$token = auth()->attempt($credentials)) {
+        if (!$tokenjwt = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Credenciales no válidas'], 401);
         }
-        $user = auth()->user();
+        $user = User::where('email', $request->email)->first();
+        log::info($user);
         if (!$user->is_active) {
             $this->mandarcorreo($user);
             return response()->json([
                 'message' => 'Verifica tu correo para activar tu cuenta.'
             ],201);
         }
+        
+
+        $jwt = $this->generateTokenWithCustomGuard($user, 'limited-access');
+        $token = $this->respondWithToken($jwt);
+
         $code = mt_rand(100000, 999999);
         $hashedCode = Hash::make($code);
         $expiresAt = now()->addMinutes(5); // Establece la expiración en 5 minutos
@@ -79,29 +108,39 @@ class AuthController extends Controller
 
     public function verifyCode(Request $request)
     {
-        $user = auth()->user();
+        
+        $credentials = Auth::user();
+        $user = User::where('email', $credentials->email)->first();
+
         log::info($user);
         $code = $request->input('code');
-       
+
         log::info($code);
-
+        //$hashedCode = Hash::make($code);
         $verificationCode = VerificationCode::where('user_id', $user->id)
-                                            ->where('is_used', false)
-                                            ->where('expires_at', '>', now())
-                                            ->first();
+                                                //->where('code', $hashedCode)
+                                                ->where('is_used', false)
+                                                ->first();
 
-        log::info($verificationCode || !Hash::check($code, $verificationCode->code));
-    
-        if ($verificationCode) {
+        log::info($verificationCode);
+        
+        if ($verificationCode || !Hash::check($code, $verificationCode->code)) {
 
-            // Código correcto, generar el token JWT
-            $token = JWTAuth::fromUser($user);
+            $jwt = $this->generateTokenWithCustomGuard($user, 'all-access');
+            $token = $this->respondWithToken($jwt);
             // Se marca el codigo como condon usado
             $verificationCode->markAsUsed();
-
-            return $this -> respondWithToken($token);
-        } else {
-            // Código incorrecto
+            
+            return response()->json([
+                'message' => 'Código de verificación correcto.',
+                'token' => $token
+            ], 200);
+            
+            } 
+            
+            
+        else {
+             // Código incorrecto
             return response()->json(['error' => 'El código de verificación es incorrecto o ha expirado.'], 401);
         }
     }
@@ -144,12 +183,12 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
-    {
+    public function respondWithToken($token){
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => $this->guard()->factory()->getTTL() * 60
+            'user'=>auth()->user(),
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
     public function register(Request $request){
@@ -166,6 +205,7 @@ class AuthController extends Controller
             ['password'=>bcrypt($request->password)]
         ));
         $token = JWTAuth::fromUser($user);
+        log::info($token);
 
         $url = URL::temporarySignedRoute(
             'activate', now()->addMinutes(30), ['token' => $token]
