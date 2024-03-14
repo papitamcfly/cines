@@ -126,7 +126,8 @@ class AuthController extends Controller
         
         if ($verificationCode || !Hash::check($code, $verificationCode->code)) {
 
-            $token = JWTAuth::fromUser($user);
+            $jwt = $this->generateTokenWithCustomGuard($user, 'all-access');
+            $token = $this->respondWithToken($jwt);
             // Se marca el codigo como condon usado
             $verificationCode->markAsUsed();
             
