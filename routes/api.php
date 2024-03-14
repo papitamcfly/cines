@@ -9,6 +9,7 @@ use App\Http\Controllers\CombosController;
 use App\Http\Controllers\GenerosController;
 use App\Http\Controllers\PeliculasController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\usuarioscontroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -107,4 +108,13 @@ Route::middleware(['auth:api','role:1,2,3'])->group(function () {
     Route::get('/funciones', [FuncionController::class, 'index'])->name('allFunciones');
     Route::get('/salas', [SalaController::class, 'index'])->name('allSalas');
     Route::get('/cines', [cineController::class, 'index'])->name('allCines');
+});
+
+Route::middleware(['auth:api','role:3'])->group(function () {
+    Route::get('/usuarios', [usuarioscontroller::class, 'index'])->name('allusuarios');
+    Route::post('/usuarios', [usuarioscontroller::class, 'store'])->name('createusuarios');
+    Route::get('/usuarios/{combo}', [usuarioscontroller::class, 'show'])->where('combo', '[0-9]+')->name('showusuarios');
+    Route::put('/usuarios/{combo}', [usuarioscontroller::class, 'update'])->where('combo', '[0-9]+')->name('updateusuarios');
+    Route::delete('/usuarios/{combo}', [usuarioscontroller::class, 'destroy'])->where('combo', '[0-9]+')->name('deleteusuarios');
+    Route::get('/roles',[usuarioscontroller::class,'showroles']);
 });
